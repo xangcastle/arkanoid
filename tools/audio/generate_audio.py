@@ -3,166 +3,183 @@ import math
 import struct
 import random
 import os
+import json
 
-def generate_tone(frequency, duration, volume=0.5, sample_rate=44100, wave_type='sine'):
+CONFIG_PATH = "tools/audio/audio_config.json"
+BASE_PATH = "assets/audio"
+
+def load_config():
+    if not os.path.exists(CONFIG_PATH):
+        print(f"Config not found at {CONFIG_PATH}")
+        return {}
+    with open(CONFIG_PATH, 'r') as f:
+        return json.load(f)
+
+def generate_oscillator(wave_type, freq, t):
+    if wave_type == 'sine':
+        return math.sin(2 * math.pi * freq * t)
+    elif wave_type == 'square':
+        return 1.0 if math.sin(2 * math.pi * freq * t) > 0 else -1.0
+    elif wave_type == 'sawtooth':
+        return 2.0 * (t * freq - math.floor(t * freq + 0.5))
+    elif wave_type == 'noise':
+        return random.uniform(-1, 1)
+    return 0.0
+
+def generate_track_data(track_def, sample_rate=44100):
+    duration = track_def.get("duration", 0.1)
+    start_freq = track_def.get("start_freq", 440)
+    end_freq = track_def.get("end_freq", start_freq)
+    vol = track_def.get("vol", 0.5)
+    wave_type = track_def.get("wave", "sine")
+    
     n_samples = int(sample_rate * duration)
     data = []
     
     for i in range(n_samples):
         t = float(i) / sample_rate
+        # Linear frequency interpretation (Slide)
+        freq = start_freq + (end_freq - start_freq) * (i / n_samples)
         
-        if wave_type == 'sine':
-            value = math.sin(2 * math.pi * frequency * t)
-        elif wave_type == 'square':
-            value = 1.0 if math.sin(2 * math.pi * frequency * t) > 0 else -1.0
-        elif wave_type == 'sawtooth':
-            value = 2.0 * (t * frequency - math.floor(t * frequency + 0.5))
-        elif wave_type == 'noise':
-            value = random.uniform(-1, 1)
-        else:
-            value = 0.0
-            
-        # Apply envelope (simple decay)
+        val = generate_oscillator(wave_type, freq, t)
+        
+        # Simple Decay Envelope
         envelope = 1.0 - (i / n_samples)
-        value *= envelope * volume
         
-        # Pack as 16-bit PCM
-        packed_value = struct.pack('h', int(value * 32767.0))
-        data.append(packed_value)
+        final_val = val * envelope * vol
+        data.append(final_val)
         
-    return b''.join(data)
+    return data
 
-def save_wav(filename, data, sample_rate=44100):
-    os.makedirs(os.path.dirname(filename), exist_ok=True)
-    with wave.open(filename, 'w') as f:
-        f.setnchannels(1)
-        f.setsampwidth(2)
-        f.setframerate(sample_rate)
-        f.writeframes(data)
-    print(f"Generated {filename}")
+def process_sound_def(name, sound_def, sample_rate=44100):
+    sound_type = sound_def.get("type", "sequence")
+    
+    # Handle Custom Generators separately
+    if sound_type == "custom":
+        gen_id = sound_def.get("generator_id")
+        params = sound_def.get("params", {})
+        dur = sound_def.get("duration", 1.0)
+        if gen_id == "warp_sfx":
+            return generate_warp(dur, params)
+        elif gen_id == "intro_music":
+            return generate_intro(dur, params)
+        else:
+            return []
 
-def main():
-    base_path = "assets/audio"
+    # Handle Standard Sequencer/Mixer
+    tracks = sound_def.get("tracks", [])
     
-    # Paddle Hit (High ping)
-    data = generate_tone(880, 0.1, wave_type='square')
-    save_wav(f"{base_path}/paddle_hit.wav", data)
+    # Sequence: Append one after another
+    # Mix: Add together (simplification: we'll just do Sequence for now as "mix" in JSON example `life` was used but logic implies overlap?)
+    # Wait, "Life" definition I wrote has "delay". Mix logic is needed for accurate timing if overlapping.
+    # For simplicity, if type is 'sequence', we concat. If type is 'mix', we add.
     
-    # Brick Hit (Crunchy noise/square mix)
-    data = generate_tone(220, 0.1, wave_type='square')
-    save_wav(f"{base_path}/brick_hit.wav", data)
+    final_buffer = []
     
-    # Metal Brick (Metallic ting)
-    data = generate_tone(1200, 0.05, wave_type='sine')
-    save_wav(f"{base_path}/brick_hit_metal.wav", data)
-    
-    # Laser (Descending slide)
-    data = bytearray()
-    for i in range(4410): # 0.1s
-        freq = 880 - (i / 10)
-        t = float(i) / 44100
-        val = math.sin(2 * math.pi * freq * t) * (1.0 - i/4410) * 0.5
-        data.extend(struct.pack('h', int(val * 32767.0)))
-    save_wav(f"{base_path}/laser.wav", bytes(data))
-    
-    # Explosion (Noise)
-    data = generate_tone(0, 0.3, wave_type='noise')
-    save_wav(f"{base_path}/explosion.wav", data)
-    
-    # Powerup (Ascending slide)
-    data = bytearray()
-    for i in range(8820): # 0.2s
-        freq = 440 + (i / 10)
-        t = float(i) / 44100
-        val = (1.0 if math.sin(2 * math.pi * freq * t) > 0 else -1.0) * (1.0 - i/8820) * 0.5
-        data.extend(struct.pack('h', int(val * 32767.0)))
-    save_wav(f"{base_path}/powerup.wav", bytes(data))
-    
-    # Life (Two tones)
-    data = generate_tone(660, 0.1, wave_type='square') + generate_tone(880, 0.2, wave_type='square')
-    save_wav(f"{base_path}/life.wav", data)
-    
-    # Game Over (Descending tristone)
-    data = generate_tone(440, 0.3, wave_type='sawtooth') + generate_tone(330, 0.3, wave_type='sawtooth') + generate_tone(220, 0.5, wave_type='sawtooth')
-    save_wav(f"{base_path}/game_over.wav", data)
+    if sound_type == "sequence":
+        for track in tracks:
+            track_data = generate_track_data(track, sample_rate)
+            final_buffer.extend(track_data)
+            
+    elif sound_type == "mix":
+        # Determine total length
+        # This is uniform sampling, a bit harder.
+        # Let's simplify: Just render each track and add them to a buffer.
+         # Find max duration
+        max_len = 0
+        rendered_tracks = []
+        for track in tracks:
+            pcm = generate_track_data(track, sample_rate)
+            delay_samples = int(track.get("delay", 0) * sample_rate)
+            total_len = delay_samples + len(pcm)
+            if total_len > max_len:
+                max_len = total_len
+            rendered_tracks.append((delay_samples, pcm))
+            
+        final_buffer = [0.0] * max_len
+        for delay, pcm in rendered_tracks:
+            for i, val in enumerate(pcm):
+                final_buffer[delay + i] += val
+                
+    return final_buffer
 
-    # Game Start (Ascending scale)
-    data = b''
-    for f in [440, 550, 660, 880]:
-        data += generate_tone(f, 0.1, wave_type='square')
-    save_wav(f"{base_path}/game_start.wav", data)
+# --- Custom Generators (Ported/Adapted) ---
 
-    # Warp (Rising sci-fi tone with tremolo)
-    data = bytearray()
-    duration = 2.0
+def generate_warp(duration, params):
     samples = int(44100 * duration)
+    buffer = []
+    start_f = params.get("freq_start", 100)
+    end_f = params.get("freq_end", 800)
+    lfo_f = params.get("lfo_freq", 15)
+    
     for i in range(samples):
         t = float(i) / 44100
-        # Rising pitch 100Hz -> 800Hz
-        freq = 100 + (700 * (t / duration))
-        # Tremolo LFO (15Hz)
-        lfo = 0.5 + 0.5 * math.sin(2 * math.pi * 15 * t)
-        
-        # Audio signal (Sawtooth-ish)
+        freq = start_f + ((end_f - start_f) * (t / duration))
+        lfo = 0.5 + 0.5 * math.sin(2 * math.pi * lfo_f * t)
         val = (2.0 * (t * freq - math.floor(t * freq + 0.5))) * lfo * 0.5
-        
-        # Fade out at end
+        # Fade out
         if t > duration - 0.2:
             val *= (duration - t) / 0.2
-            
-        data.extend(struct.pack('h', int(val * 32767.0)))
-    save_wav(f"{base_path}/warp.wav", bytes(data))
+        buffer.append(val)
+    return buffer
 
-    # Intro Music (Cinematic sequence: Drone -> Chaos -> Driving)
-    data = bytearray()
-    duration = 14.0 # 14 seconds total
+def generate_intro(duration, params):
     samples = int(44100 * duration)
-    
-    # Bass line frequencies
-    bass_notes = [55, 55, 55, 55, 58, 58, 62, 62] # A, C, D
+    buffer = []
+    bass_notes = [55, 55, 55, 55, 58, 58, 62, 62]
     
     for i in range(samples):
         t = float(i) / 44100
-        
-        # Part 1: Ominous Drone (0-4s)
-        # Part 2: Chaos/Destruction (4-9s)
-        # Part 3: Warp/Speed (9-14s)
-        
         val = 0.0
         
-        # 1. Base Drone (Rich low end)
-        drone_freq = 55.0 # A1
-        # Mix 55Hz sine + 110Hz square (low volume) for presence
+        # Drone
+        drone_freq = 55.0
         drone = (math.sin(2 * math.pi * drone_freq * t) * 0.5) + \
                 (0.5 if math.sin(2 * math.pi * (drone_freq * 2) * t) > 0 else -0.5) * 0.2
-        
-        # 2. Melody/Texture
+                
         if t < 4.0:
-            # Slow pulse
-            # Offset pulse 0.5 to keep it positive mostly -> amplitude modulation instead of ring mod
             pulse = 0.5 + 0.5 * math.sin(2 * math.pi * 2.0 * t) 
             val = drone * pulse
         elif t < 9.0:
-            # Chaos - DOH appears
-            # Add noise and higher dissonant tones
             noise = random.uniform(-0.5, 0.5) * 0.3
             alarm = math.sin(2 * math.pi * 440 * t) * (1.0 if t % 0.5 < 0.25 else 0.0) * 0.2
             val = drone + noise + alarm
         else:
-            # Warp - Driving sequence
-            # Arpeggio
-            tempo = 8.0 # notes per second
+            tempo = 8.0
             note_idx = int(t * tempo) % len(bass_notes)
             bass_freq = bass_notes[note_idx]
             bass = (1.0 if math.sin(2 * math.pi * bass_freq * t) > 0 else -1.0) * 0.4
-            
-            # High speed wind
             wind = random.uniform(-0.1, 0.1) * 0.2
             val = bass + wind
             
-        data.extend(struct.pack('h', int(max(-1.0, min(1.0, val)) * 32767.0)))
+        buffer.append(max(-1.0, min(1.0, val)))
         
-    save_wav(f"{base_path}/intro_music.wav", bytes(data))
+    return buffer
+
+def save_wav_from_floats(filename, float_data, sample_rate=44100):
+    os.makedirs(os.path.dirname(filename), exist_ok=True)
+    # Convert floats to 16-bit PCM (bytes)
+    byte_data = bytearray()
+    for val in float_data:
+        # Hard clip
+        clamped = max(-1.0, min(1.0, val))
+        byte_data.extend(struct.pack('h', int(clamped * 32767.0)))
+        
+    with wave.open(filename, 'w') as f:
+        f.setnchannels(1)
+        f.setsampwidth(2)
+        f.setframerate(sample_rate)
+        f.writeframes(byte_data)
+    print(f"Generated {filename}")
+
+def main():
+    print("Loading Audio Config...")
+    config = load_config()
+    
+    for name, definition in config.items():
+        print(f"Synthesizing {name}...")
+        audio_buffer = process_sound_def(name, definition)
+        save_wav_from_floats(f"{BASE_PATH}/{name}.wav", audio_buffer)
 
 if __name__ == "__main__":
     main()

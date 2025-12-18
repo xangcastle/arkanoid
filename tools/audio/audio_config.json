@@ -1,0 +1,184 @@
+{
+    "paddle_hit": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 880,
+                "end_freq": 880,
+                "duration": 0.1,
+                "vol": 0.5
+            }
+        ]
+    },
+    "brick_hit": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 220,
+                "end_freq": 220,
+                "duration": 0.1,
+                "vol": 0.5
+            }
+        ]
+    },
+    "brick_hit_metal": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "sine",
+                "start_freq": 1200,
+                "end_freq": 1200,
+                "duration": 0.05,
+                "vol": 0.5
+            }
+        ]
+    },
+    "laser": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "sine",
+                "start_freq": 880,
+                "end_freq": 440,
+                "duration": 0.1,
+                "vol": 0.5
+            }
+        ]
+    },
+    "explosion": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "noise",
+                "start_freq": 0,
+                "end_freq": 0,
+                "duration": 0.3,
+                "vol": 0.5
+            }
+        ]
+    },
+    "powerup": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 440,
+                "end_freq": 1322,
+                "duration": 0.2,
+                "vol": 0.5
+            }
+        ]
+    },
+    "life": {
+        "type": "mix",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 660,
+                "end_freq": 660,
+                "duration": 0.1,
+                "vol": 0.5
+            },
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 880,
+                "end_freq": 880,
+                "duration": 0.2,
+                "vol": 0.5,
+                "delay": 0.1
+            }
+        ]
+    },
+    "game_over": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "sawtooth",
+                "start_freq": 440,
+                "end_freq": 440,
+                "duration": 0.3,
+                "vol": 0.5
+            },
+            {
+                "type": "tone",
+                "wave": "sawtooth",
+                "start_freq": 330,
+                "end_freq": 330,
+                "duration": 0.3,
+                "vol": 0.5
+            },
+            {
+                "type": "tone",
+                "wave": "sawtooth",
+                "start_freq": 220,
+                "end_freq": 220,
+                "duration": 0.5,
+                "vol": 0.5
+            }
+        ]
+    },
+    "game_start": {
+        "type": "sequence",
+        "tracks": [
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 440,
+                "end_freq": 440,
+                "duration": 0.1,
+                "vol": 0.5
+            },
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 550,
+                "end_freq": 550,
+                "duration": 0.1,
+                "vol": 0.5
+            },
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 660,
+                "end_freq": 660,
+                "duration": 0.1,
+                "vol": 0.5
+            },
+            {
+                "type": "tone",
+                "wave": "square",
+                "start_freq": 880,
+                "end_freq": 880,
+                "duration": 0.1,
+                "vol": 0.5
+            }
+        ]
+    },
+    "warp": {
+        "type": "custom",
+        "generator_id": "warp_sfx",
+        "duration": 2.0,
+        "params": {
+            "freq_start": 100,
+            "freq_end": 800,
+            "lfo_freq": 15
+        }
+    },
+    "intro_music": {
+        "type": "custom",
+        "generator_id": "intro_music",
+        "duration": 14.0,
+        "params": {}
+    }
+}
