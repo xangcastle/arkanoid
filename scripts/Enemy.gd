@@ -71,7 +71,7 @@ func _physics_process(delta):
         queue_free()
 
 func _on_body_entered(body):
-    if body.name == "Vaus":
+    if body.is_in_group("Player"):
         GameManager.on_player_hit()
         queue_free()
     elif body.is_in_group("Balls"):

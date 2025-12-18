@@ -34,8 +34,10 @@ func _process(delta):
         queue_free()
 
 func _on_body_entered(body):
-    if body.name == "Vaus":
+    if body.is_in_group("Player"):
+        GameManager.apply_powerup(type, body)
         AudioManager.play("powerup")
+        queue_free()
         apply_powerup(body)
         queue_free()
 
