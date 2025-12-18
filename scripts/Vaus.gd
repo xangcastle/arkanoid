@@ -30,7 +30,7 @@ func _physics_process(_delta):
     move_and_slide()
     
     # Clamp position to screen bounds
-    global_position.x = clamp(global_position.x, 24 + width/2, 424 - width/2)
+    global_position.x = clamp(global_position.x, width/2, 448 - width/2)
 
     if Input.is_action_just_pressed("fire"):
         if current_state == State.LASER:

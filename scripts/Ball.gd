@@ -11,10 +11,10 @@ var stuck_offset = Vector2.ZERO
 
 var active_lock = false
 
-func start_on_paddle(paddle):
+func start_on_paddle(paddle, offset_x = 0.0):
 	active = false
 	stuck_to_paddle = paddle
-	stuck_offset = Vector2(0, -10)
+	stuck_offset = Vector2(offset_x, -10)
 	global_position = paddle.global_position + stuck_offset
 
 func launch():
@@ -88,8 +88,9 @@ func _physics_process(delta):
 			# Collisions happen -> bounce -> catch.
 			# We need to distinguish "Landing on paddle" vs "Just launched".
 			# When launched, we start slightly above stuck pos?
+			# Catch logic if enabled (call release_ball on paddle input)
 			if paddle.current_state == paddle.State.CATCH and not active_lock:
-				start_on_paddle(paddle)
+				start_on_paddle(paddle, diff_x)
 
 	# Brick interaction
 	if collision and collision.get_collider().has_method("hit"):

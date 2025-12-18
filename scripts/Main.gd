@@ -14,13 +14,28 @@ func _ready():
     GameManager.score_changed.connect(_on_score_changed)
     GameManager.lives_changed.connect(_on_lives_changed)
     GameManager.level_completed.connect(_on_level_completed)
+    GameManager.game_over.connect(_on_game_over)
     start_game()
 
 func _on_level_completed():
+    call_deferred("_deferred_level_load")
+
+func _deferred_level_load():
+    get_tree().call_group("Balls", "queue_free")
     load_level(GameManager.level)
-    spawn_ball() # Reset ball
+    spawn_ball()
     if vaus:
-        vaus.position = Vector2(224, 450) # Reset position
+        vaus.position = Vector2(224, 450)
+
+func _on_game_over():
+    # Simple Game Over for now
+    var label = Label.new()
+    label.text = "GAME OVER"
+    label.position = Vector2(180, 250)
+    add_child(label)
+    await get_tree().create_timer(3.0).timeout
+    label.queue_free()
+    start_game()
 
 func start_game():
     GameManager.reset_game()
