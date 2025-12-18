@@ -1,0 +1,5 @@
+load("@rules_godot//:defs.bzl", "godot_project")
+
+godot_project(
+    name = "arkanoid",
+)

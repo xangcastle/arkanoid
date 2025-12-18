@@ -9,3 +9,5 @@ godot.toolchain(
     name = "godot",
 )
 use_repo(godot, "godot")
+
+register_toolchains("@godot//:godot_toolchain")

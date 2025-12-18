@@ -22,7 +22,18 @@ def _imp(repository_ctx):
         fail("Unsupported platform: {}".format(platform))
 
     repository_ctx.file("BUILD.bazel", """
-exports_files(["{binary}"])
+load("@rules_godot//:toolchain.bzl", "godot_toolchain_impl")
+
+godot_toolchain_impl(
+    name = "toolchain_impl",
+    binary = ":{binary}",
+)
+
+toolchain(
+    name = "godot_toolchain",
+    toolchain = ":toolchain_impl",
+    toolchain_type = "@rules_godot//:toolchain_type",
+)
 
 sh_binary(
     name = "godot",
