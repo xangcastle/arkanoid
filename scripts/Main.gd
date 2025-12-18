@@ -20,7 +20,37 @@ func _ready():
 	# Capture mouse to keep it in window and hide it (User request)
 	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 	
+	# Main must run while paused to handle input
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	
+	create_pause_label()
 	start_game()
+
+func create_pause_label():
+	var label = Label.new()
+	label.text = "PAUSED\nCLICK TO RESUME"
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.name = "PauseLabel"
+	label.visible = false
+	# Center it
+	label.anchors_preset = Control.PRESET_CENTER
+	label.position = Vector2(224 - 50, 256 - 20) # Approx center
+	
+	# Add to CanvasLayer
+	$CanvasLayer.add_child(label)
+
+func pause_game():
+	get_tree().paused = true
+	var label = $CanvasLayer/PauseLabel
+	if label: label.show()
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func resume_game():
+	get_tree().paused = false
+	var label = $CanvasLayer/PauseLabel
+	if label: label.hide()
+	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
 
 func _on_player_died():
 	call_deferred("_deferred_player_died")
@@ -39,24 +69,32 @@ func _on_level_completed():
 func _deferred_level_load():
 	get_tree().call_group("Balls", "queue_free")
 	
-	# Hide game elements or just overlay the warp?
-	# Overlay is better.
+	# Overlay warp transition
 	var warp_scene = load("res://scenes/core/Warp.tscn")
 	var warp = warp_scene.instantiate()
-	add_child(warp)
+	# Add to a CanvasLayer for top-level rendering if possible, but Main is a Node2D.
+	# The Warp scene itself should ideally be on a CanvasLayer or high z-index.
+	# Assuming Warp.tscn is just Control/Node2D.
+	# In previous edits I added it to a specific layer but here I'll just add as child
+	# since user checked it before.
+	# Wait, previous edit added it to a CanvasLayer constructed on the fly?
+	# "Updated _deferred_level_load to add the Warp scene to a CanvasLayer"
+	# Let's check if I should do that.
+	var layer = CanvasLayer.new()
+	layer.layer = 100
+	add_child(layer)
+	layer.add_child(warp)
 	
 	# Wait for warp to finish
 	await warp.warp_finished
 	
-	if is_instance_valid(vaus):
-		# Ensure Vaus is safe during warp or just reset after?
-		# We reset after load_level
-		pass
-		
 	load_level(GameManager.level)
 	spawn_ball()
 	if vaus and is_instance_valid(vaus):
 		vaus.position = Vector2(224, 450)
+	
+	# Cleanup layer
+	layer.queue_free()
 
 func _on_game_over():
 	get_tree().change_scene_to_file("res://scenes/core/GameOver.tscn")
@@ -119,11 +157,11 @@ func load_level(level_num):
 	print("Level ", level_num, " Loaded")
 
 func _process(_delta):
+	if get_tree().paused:
+		return
+
 	# Check if ball is lost
-	# Better to have the ball emit a signal, but polling here is simple for now
 	var balls = get_tree().get_nodes_in_group("Balls")
-	# Actually, let's just use the children.
-	# A cleaner way is to having the Ball emit 'tree_exiting' or handle it in Ball.gd
 	
 	if randf() < 0.001: # Low chance per frame (~once per 16s at 60fps)
 		spawn_enemy()
@@ -137,18 +175,27 @@ func _on_ball_lost():
 		if is_instance_valid(b) and not b.is_queued_for_deletion():
 			active_count += 1
 	
-	# The ball calling this is likely still in the group but queued for freeing or about to be?
-	# Actually, queue_free happens after this frame usually, but let's assume the signal caller is dying.
-	# If explicit count is 0 (excluding the one calling if we could filter it), then lose life.
-	
-	# A safer way: Wait a frame or just check count <= 1 (the one dying)
 	if active_count <= 1:
 		GameManager.lose_life()
 		spawn_ball()
-		# Just one ball died, others remain
 		AudioManager.play("powerup")
 
 func _unhandled_input(event):
+	# Handle Pause Input (Always check)
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_ESCAPE:
+			if not get_tree().paused:
+				pause_game()
+			else:
+				# Strict Click-to-Resume as requested
+				pass
+	
+	if event is InputEventMouseButton and event.pressed:
+		if get_tree().paused:
+			resume_game()
+			get_viewport().set_input_as_handled() # Consume input so it doesn't fire ball
+			return
+
 	# Debug Mode: Activate with ARK_DEBUG=1
 	if OS.get_environment("ARK_DEBUG") != "1":
 		return
