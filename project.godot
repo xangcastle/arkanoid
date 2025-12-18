@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="arkanoid"
-run/main_scene="uid://b8j5x6yq0q1w"
+run/main_scene="res://scenes/core/Intro.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 

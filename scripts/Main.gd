@@ -16,6 +16,10 @@ func _ready():
 	GameManager.level_completed.connect(_on_level_completed)
 	GameManager.game_over.connect(_on_game_over)
 	GameManager.player_died.connect(_on_player_died)
+	
+	# Capture mouse to keep it in window and hide it (User request)
+	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+	
 	start_game()
 
 func _on_player_died():
@@ -34,20 +38,28 @@ func _on_level_completed():
 
 func _deferred_level_load():
 	get_tree().call_group("Balls", "queue_free")
+	
+	# Hide game elements or just overlay the warp?
+	# Overlay is better.
+	var warp_scene = load("res://scenes/core/Warp.tscn")
+	var warp = warp_scene.instantiate()
+	add_child(warp)
+	
+	# Wait for warp to finish
+	await warp.warp_finished
+	
+	if is_instance_valid(vaus):
+		# Ensure Vaus is safe during warp or just reset after?
+		# We reset after load_level
+		pass
+		
 	load_level(GameManager.level)
 	spawn_ball()
-	if vaus:
+	if vaus and is_instance_valid(vaus):
 		vaus.position = Vector2(224, 450)
 
 func _on_game_over():
-	# Simple Game Over for now
-	var label = Label.new()
-	label.text = "GAME OVER"
-	label.position = Vector2(180, 250)
-	add_child(label)
-	await get_tree().create_timer(3.0).timeout
-	label.queue_free()
-	start_game()
+	get_tree().change_scene_to_file("res://scenes/core/GameOver.tscn")
 
 func start_game():
 	GameManager.reset_game()
@@ -155,9 +167,9 @@ func _unhandled_input(event):
 		if type != -1:
 			var player = get_tree().get_first_node_in_group("Player")
 			if player:
-				print("Debug Powerup: ", type)
-				GameManager.apply_powerup(type, player)
-				AudioManager.play("powerup")
+				print("Debug Powerup Spawn: ", type)
+				# Spawn at top of screen to test falling/collection
+				GameManager.spawn_specific_powerup(Vector2(224, 60), type)
 		
 		# Debug Enemies
 		if event.keycode >= KEY_1 and event.keycode <= KEY_4:

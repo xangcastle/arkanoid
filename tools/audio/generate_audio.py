@@ -92,5 +92,26 @@ def main():
         data += generate_tone(f, 0.1, wave_type='square')
     save_wav(f"{base_path}/game_start.wav", data)
 
+    # Warp (Rising sci-fi tone with tremolo)
+    data = bytearray()
+    duration = 2.0
+    samples = int(44100 * duration)
+    for i in range(samples):
+        t = float(i) / 44100
+        # Rising pitch 100Hz -> 800Hz
+        freq = 100 + (700 * (t / duration))
+        # Tremolo LFO (15Hz)
+        lfo = 0.5 + 0.5 * math.sin(2 * math.pi * 15 * t)
+        
+        # Audio signal (Sawtooth-ish)
+        val = (2.0 * (t * freq - math.floor(t * freq + 0.5))) * lfo * 0.5
+        
+        # Fade out at end
+        if t > duration - 0.2:
+            val *= (duration - t) / 0.2
+            
+        data.extend(struct.pack('h', int(val * 32767.0)))
+    save_wav(f"{base_path}/warp.wav", bytes(data))
+
 if __name__ == "__main__":
     main()

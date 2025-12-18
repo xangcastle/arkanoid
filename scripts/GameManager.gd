@@ -67,6 +67,18 @@ func spawn_powerup(pos):
     
     active_powerups_count += 1
 
+func spawn_specific_powerup(pos, type_int):
+    var main = get_tree().current_scene
+    if not main: return
+
+    var pu_scene = load("res://scenes/entities/PowerUp.tscn")
+    var pu = pu_scene.instantiate()
+    pu.type = type_int
+    pu.position = pos
+    main.call_deferred("add_child", pu)
+    
+    active_powerups_count += 1
+
 func powerup_gone():
     active_powerups_count = max(0, active_powerups_count - 1)
 
@@ -77,6 +89,7 @@ func add_score(points):
     score_changed.emit(score)
 
 func lose_life():
+    reset_powerup_effects()
     lives -= 1
     lives_changed.emit(lives)
     if lives < 0:
@@ -97,8 +110,40 @@ func reset_game():
     reset_powerup_logic()
 
 func next_level():
+    reset_powerup_effects()
     level += 1
     level_completed.emit()
+
+func reset_powerup_effects():
+    var vaus = get_tree().get_first_node_in_group("Player")
+    if vaus and vaus.has_method("reset_state"):
+        vaus.reset_state()
+    
+    # Also reset slow ball speed? Usually speed persists, but sticking resets.
+    var balls = get_tree().get_nodes_in_group("Balls")
+    for b in balls:
+        if b.has_method("slow_down"):
+            b.slow_down()
+        if "stuck_to_paddle" in b:
+            b.stuck_to_paddle = null
+            b.active_lock = false
+
+
+func check_level_completion():
+    var bricks = get_tree().get_nodes_in_group("Bricks")
+    var breakable_count = 0
+    for b in bricks:
+        if is_instance_valid(b) and not b.is_queued_for_deletion():
+            # Assuming 'type' property access or method to check if breakable
+            # Gold bricks are type 9 (from Brick.gd logic inferred, let's Verify)
+            if b.get("type") != 9: # Type.GOLD
+                breakable_count += 1
+    
+    print("Level Completion Check: ", breakable_count, " breakable bricks remaining.")
+    
+    if breakable_count == 0:
+        print("Level Complete! Moving to next...")
+        call_deferred("next_level")
 
 func apply_powerup(type, vaus):
     # S=0, L=1, C=2, E=3, D=4, B=5, P=6

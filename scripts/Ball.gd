@@ -34,7 +34,9 @@ func duplicate_ball():
 	var new_ball = duplicate()
 	new_ball.position = position
 	new_ball.direction = direction.rotated(randf_range(-0.5, 0.5))
+	new_ball.velocity = new_ball.direction * current_speed # Update physics vel
 	new_ball.active = true
+	new_ball.stuck_to_paddle = null # Ensure not stuck
 	get_parent().call_deferred("add_child", new_ball)
 
 func _physics_process(delta):

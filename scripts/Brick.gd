@@ -27,6 +27,7 @@ const POINTS = {
 }
 
 func _ready():
+	add_to_group("Bricks")
 	setup_brick()
 
 func setup_brick():
@@ -63,7 +64,14 @@ func die():
 	GameManager.add_score(value)
 	# Attempt powerup drop
 	GameManager.attempt_drop_powerup(global_position)
+	
+	# Check for level completion
+	# We must queue_free first or the check will count this brick
+	# But queue_free is deferred deletion.
+	# So GameManager check must handle is_queued_for_deletion (which I added).
+	hide() # Hide immediately
 	queue_free()
+	GameManager.check_level_completion()
 
 func spawn_powerup():
 	var main = get_tree().current_scene

@@ -75,3 +75,8 @@ func transform_to(new_state):
             collision.shape.size.x = 110.0
         _:
             pass # Reset handled above
+
+func reset_state():
+    transform_to(State.NORMAL)
+    # Also clear any laser nodes if we want, though they are children of parent usually or timers?
+    # Actually lasers are separate nodes. We just reset the paddle capability.
