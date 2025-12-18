@@ -5,7 +5,7 @@ const ACCEL = 20.0
 const FRICTION = 15.0
 
 var input_axis = 0.0
-var width = 32.0 # Default width
+var width = 80.0 # Default width (sprite is 79)
 
 enum State { NORMAL, LASER, CATCH, EXPAND }
 var current_state = State.NORMAL

@@ -1,10 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://c8j5x6yq0q2w"]
 
-[ext_resource type="Script" uid="uid://dumyl51mdn5yw" path="res://scripts/Vaus.gd" id="1_vaus"]
-[ext_resource type="Texture2D" uid="uid://gcvy56mpycvj" path="res://assets/graphics/paddle.png" id="2_tex"]
+[ext_resource type="Script" path="res://scripts/Vaus.gd" id="1_vaus"]
+[ext_resource type="Texture2D" path="res://assets/graphics/paddle.png" id="2_tex"]
 
 [sub_resource type="RectangleShape2D" id="rect_shape"]
-size = Vector2(70, 17)
+size = Vector2(78, 16)
 
 [node name="Vaus" type="CharacterBody2D"]
 collision_layer = 2
@@ -14,7 +14,6 @@ script = ExtResource("1_vaus")
 texture = ExtResource("2_tex")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -0.5)
 shape = SubResource("rect_shape")
 
 [node name="LaserLeft" type="Marker2D" parent="."]

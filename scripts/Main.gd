@@ -65,7 +65,8 @@ func load_level(level_num):
     
     # Use LevelLoader class
     var loader = load("res://scripts/LevelLoader.gd")
-    loader.load_level_from_image(current_level_node, level_num)
+    loader.load_level(current_level_node, level_num)
+    print("Level ", level_num, " Loaded")
 
 func _process(_delta):
     # Check if ball is lost

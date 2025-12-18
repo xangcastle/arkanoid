@@ -38,7 +38,10 @@ func verify_mechanics():
     
     brick.queue_free()
         
-    # Test level loader?
+    # Test level loader checks file
     var level_loader = load("res://scripts/LevelLoader.gd")
-    if level_loader:
-        print("PASS: LevelLoader parsed")
+    # Verify parsing method exists
+    if level_loader.has_method("load_level"):
+         print("PASS: LevelLoader parsed")
+    else:
+         print("FAIL: LevelLoader method missing")

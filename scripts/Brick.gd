@@ -43,6 +43,9 @@ func setup_brick():
     var tex_path = COLORS.get(type)
     if tex_path:
         sprite.texture = load(tex_path)
+        # Scale to match 32x16 grid (sprites are ~43x21)
+        var tex_size = sprite.texture.get_size()
+        sprite.scale = Vector2(32.0 / tex_size.x, 16.0 / tex_size.y)
 
 func hit():
     if type == Type.GOLD:

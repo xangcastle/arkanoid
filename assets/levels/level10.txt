@@ -1,0 +1,8 @@
+.X.X.X.X.X.X.X
+.r.r.r.r.r.r.r
+.X.X.X.X.X.X.X
+.o.o.o.o.o.o.o
+.X.X.X.X.X.X.X
+.y.y.y.y.y.y.y
+.X.X.X.X.X.X.X
+.g.g.g.g.g.g.g
