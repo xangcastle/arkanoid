@@ -2,16 +2,12 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c8bva4aq5c0e5"
-path="res://.godot/imported/boss_doh.png-8197daf29bc5f349257b6fa2d1b02c01.ctex"
-metadata={
-"vram_texture": false
-}
+uid="uid://mrbnyj06lr2u"
+valid=false
 
 [deps]
 
-source_file="res://assets/graphics/boss_doh.png"
-dest_files=["res://.godot/imported/boss_doh.png-8197daf29bc5f349257b6fa2d1b02c01.ctex"]
+source_file="res://assets/graphics/intro_destruction.png"
 
 [params]
 

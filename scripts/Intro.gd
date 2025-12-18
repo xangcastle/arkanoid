@@ -5,7 +5,7 @@ extends Control
 func _ready():
     # Start the intro sequence
     anim.play("intro_sequence")
-    AudioManager.play("music_intro") # Assuming we have or will add this, otherwise quiet
+    AudioManager.play("intro_music")
 
 func _process(_delta):
     if Input.is_action_just_pressed("fire") or Input.is_action_just_pressed("start"):

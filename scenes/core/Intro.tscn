@@ -1,32 +1,83 @@
-[gd_scene load_steps=6 format=3 uid="uid://w01iohvi0bkk"]
+[gd_scene load_steps=19 format=3 uid="uid://w01iohvi0bkk"]
 
 [ext_resource type="Script" uid="uid://qet6v1wyrq7" path="res://scripts/Intro.gd" id="1_intro"]
-[ext_resource type="Texture2D" uid="uid://mr8m7bkb34sc" path="res://assets/graphics/intro_mothership.png" id="2_nq6jr"]
-[ext_resource type="Texture2D" uid="uid://gcvy56mpycvj" path="res://assets/graphics/paddle.png" id="3_vaus"]
+[ext_resource type="Texture2D" uid="uid://mr8m7bkb34sc" path="res://assets/graphics/intro_mothership.png" id="2_ship"]
+[ext_resource type="Texture2D" uid="uid://c8bva4aq5c0e5" path="res://assets/graphics/boss_doh.png" id="3_doh"]
+[ext_resource type="Texture2D" uid="uid://gcvy56mpycvj" path="res://assets/graphics/paddle.png" id="4_vaus"]
+[ext_resource type="Texture2D" uid="uid://b4i3qvs1stlbp" path="res://assets/graphics/enemy_explosion_1.png" id="6_exp1"]
+[ext_resource type="Texture2D" uid="uid://cpl5guvq30fvf" path="res://assets/graphics/enemy_explosion_2.png" id="7_exp2"]
+[ext_resource type="Texture2D" uid="uid://b48xjxd6t34ce" path="res://assets/graphics/enemy_explosion_3.png" id="8_exp3"]
+[ext_resource type="Texture2D" uid="uid://dec6glqpxyb34" path="res://assets/graphics/enemy_explosion_4.png" id="9_exp4"]
+[ext_resource type="Texture2D" uid="uid://cww62mmunyamd" path="res://assets/graphics/enemy_explosion_5.png" id="10_exp5"]
+[ext_resource type="Texture2D" uid="uid://behokymjihtkr" path="res://assets/graphics/enemy_explosion_6.png" id="11_exp6"]
+[ext_resource type="Texture2D" uid="uid://dkfwddmb6ivo8" path="res://assets/graphics/enemy_explosion_7.png" id="12_exp7"]
+[ext_resource type="Texture2D" uid="uid://baxku3yja6j8g" path="res://assets/graphics/enemy_explosion_8.png" id="13_exp8"]
+[ext_resource type="Texture2D" uid="uid://cfxv1jasyp5b1" path="res://assets/graphics/enemy_explosion_9.png" id="14_exp9"]
+[ext_resource type="Texture2D" uid="uid://dr3wsmqjeklm3" path="res://assets/graphics/warp_tunnel.png" id="14_s5kel"]
+[ext_resource type="Texture2D" uid="uid://2y386y8lv2uo" path="res://assets/graphics/enemy_explosion_10.png" id="15_exp10"]
+
+[sub_resource type="SpriteFrames" id="frames_explosion"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_exp1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_exp2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_exp3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_exp4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_exp5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_exp6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_exp7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_exp8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_exp9")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_exp10")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
 
 [sub_resource type="Animation" id="anim_intro"]
 resource_name = "intro_sequence"
-length = 8.0
+length = 14.0
+step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Mothership:position")
+tracks/0/path = NodePath("Mothership:visible")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 4),
+"times": PackedFloat32Array(0, 9),
 "transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(224, 256), Vector2(224, 256)]
+"update": 1,
+"values": [true, false]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Label:visible")
+tracks/1/path = NodePath("DOH:visible")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
-"times": PackedFloat32Array(0, 1, 4.5),
+"times": PackedFloat32Array(0, 4, 9),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
 "values": [false, true, false]
@@ -34,38 +85,113 @@ tracks/1/keys = {
 tracks/2/type = "value"
 tracks/2/imported = false
 tracks/2/enabled = true
-tracks/2/path = NodePath("Vaus:visible")
+tracks/2/path = NodePath("DOH:modulate")
 tracks/2/interp = 1
 tracks/2/loop_wrap = true
 tracks/2/keys = {
-"times": PackedFloat32Array(0, 4.8),
+"times": PackedFloat32Array(4, 6),
 "transitions": PackedFloat32Array(1, 1),
-"update": 1,
-"values": [false, true]
+"update": 0,
+"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1)]
 }
 tracks/3/type = "value"
 tracks/3/imported = false
 tracks/3/enabled = true
-tracks/3/path = NodePath("Vaus:position")
+tracks/3/path = NodePath("WarpBG:visible")
 tracks/3/interp = 1
 tracks/3/loop_wrap = true
 tracks/3/keys = {
-"times": PackedFloat32Array(4.8, 6),
+"times": PackedFloat32Array(0, 9),
 "transitions": PackedFloat32Array(1, 1),
-"update": 0,
-"values": [Vector2(224, 256), Vector2(224, 600)]
+"update": 1,
+"values": [false, true]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
 tracks/4/enabled = true
-tracks/4/path = NodePath("ExplosionFlash:color")
+tracks/4/path = NodePath("Label:text")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(4, 4.2, 5),
+"times": PackedFloat32Array(0, 4, 9),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": ["ARKANOID MOTHERSHIP
+MISSION: COLONIZATION", "WARNING: DIMENSIONAL BREACH
+TARGET: DOH", "ESCAPING TO VOID...
+LEVEL 1 INITIALIZED"]
+}
+tracks/5/type = "value"
+tracks/5/imported = false
+tracks/5/enabled = true
+tracks/5/path = NodePath("Vaus:visible")
+tracks/5/interp = 1
+tracks/5/loop_wrap = true
+tracks/5/keys = {
+"times": PackedFloat32Array(0, 7),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [false, true]
+}
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("Vaus:position")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(7, 9, 14),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Color(1, 1, 1, 0), Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
+"values": [Vector2(224, 256), Vector2(224, 256), Vector2(224, 600)]
+}
+tracks/7/type = "value"
+tracks/7/imported = false
+tracks/7/enabled = true
+tracks/7/path = NodePath("Vaus:scale")
+tracks/7/interp = 1
+tracks/7/loop_wrap = true
+tracks/7/keys = {
+"times": PackedFloat32Array(7, 9, 14),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(0.1, 0.1), Vector2(1, 1), Vector2(0, 0)]
+}
+tracks/8/type = "value"
+tracks/8/imported = false
+tracks/8/enabled = true
+tracks/8/path = NodePath("Mothership:position")
+tracks/8/interp = 1
+tracks/8/loop_wrap = true
+tracks/8/keys = {
+"times": PackedFloat32Array(0, 4, 4.05, 4.1, 4.15, 4.2, 4.25, 4.3, 4.35, 4.4, 8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(224, 256), Vector2(224, 256), Vector2(230, 260), Vector2(218, 250), Vector2(228, 252), Vector2(220, 258), Vector2(226, 254), Vector2(222, 256), Vector2(224, 256), Vector2(224, 256), Vector2(224, 256)]
+}
+tracks/9/type = "value"
+tracks/9/imported = false
+tracks/9/enabled = true
+tracks/9/path = NodePath("Mothership:modulate")
+tracks/9/interp = 1
+tracks/9/loop_wrap = true
+tracks/9/keys = {
+"times": PackedFloat32Array(0, 4, 6, 8, 9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 1), Color(1, 0, 0, 1), Color(0.2, 0.2, 0.2, 1), Color(0, 0, 0, 0)]
+}
+tracks/10/type = "value"
+tracks/10/imported = false
+tracks/10/enabled = true
+tracks/10/path = NodePath("ExplosionRoot:visible")
+tracks/10/interp = 1
+tracks/10/loop_wrap = true
+tracks/10/keys = {
+"times": PackedFloat32Array(0, 4.5, 9),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [false, true, false]
 }
 
 [sub_resource type="AnimationLibrary" id="anim_lib"]
@@ -93,32 +219,72 @@ color = Color(0, 0, 0, 1)
 
 [node name="Mothership" type="Sprite2D" parent="."]
 position = Vector2(224, 256)
-texture = ExtResource("2_nq6jr")
+texture = ExtResource("2_ship")
 
-[node name="Vaus" type="Sprite2D" parent="."]
+[node name="DOH" type="Sprite2D" parent="."]
 visible = false
+modulate = Color(1, 1, 1, 0)
+position = Vector2(350, 150)
+scale = Vector2(0.8, 0.8)
+texture = ExtResource("3_doh")
+
+[node name="ExplosionRoot" type="Node2D" parent="."]
+visible = false
+
+[node name="Exp1" type="AnimatedSprite2D" parent="ExplosionRoot"]
 position = Vector2(224, 256)
-texture = ExtResource("3_vaus")
+scale = Vector2(3, 3)
+sprite_frames = SubResource("frames_explosion")
+autoplay = "default"
+frame_progress = 0.5
 
-[node name="Label" type="Label" parent="."]
+[node name="Exp2" type="AnimatedSprite2D" parent="ExplosionRoot"]
+position = Vector2(100, 200)
+scale = Vector2(2, 2)
+sprite_frames = SubResource("frames_explosion")
+autoplay = "default"
+frame_progress = 0.2
+
+[node name="Exp3" type="AnimatedSprite2D" parent="ExplosionRoot"]
+position = Vector2(300, 300)
+scale = Vector2(2, 2)
+sprite_frames = SubResource("frames_explosion")
+autoplay = "default"
+frame_progress = 0.8
+
+[node name="WarpBG" type="TextureRect" parent="."]
 visible = false
-layout_mode = 0
-offset_left = 64.0
-offset_top = 400.0
-offset_right = 384.0
-offset_bottom = 449.0
-text = "THE ERA OF ARKANOID
-HAS COME TO AN END..."
-horizontal_alignment = 1
-
-[node name="ExplosionFlash" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(1, 1, 1, 0)
+texture = ExtResource("14_s5kel")
+stretch_mode = 6
+
+[node name="Vaus" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(224, 256)
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("4_vaus")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -160.0
+offset_top = -100.0
+offset_right = 160.0
+offset_bottom = -51.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "ARKANOID MOTHERSHIP
+MISSION: COLONIZATION"
+horizontal_alignment = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

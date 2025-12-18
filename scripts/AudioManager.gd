@@ -15,6 +15,7 @@ func _ready():
     load_sound("game_over", "game_over.wav")
     load_sound("game_start", "game_start.wav")
     load_sound("warp", "warp.wav")
+    load_sound("intro_music", "intro_music.wav")
 
 func load_sound(name, file):
     var path = AUDIO_PATH + file

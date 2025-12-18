@@ -113,5 +113,56 @@ def main():
         data.extend(struct.pack('h', int(val * 32767.0)))
     save_wav(f"{base_path}/warp.wav", bytes(data))
 
+    # Intro Music (Cinematic sequence: Drone -> Chaos -> Driving)
+    data = bytearray()
+    duration = 14.0 # 14 seconds total
+    samples = int(44100 * duration)
+    
+    # Bass line frequencies
+    bass_notes = [55, 55, 55, 55, 58, 58, 62, 62] # A, C, D
+    
+    for i in range(samples):
+        t = float(i) / 44100
+        
+        # Part 1: Ominous Drone (0-4s)
+        # Part 2: Chaos/Destruction (4-9s)
+        # Part 3: Warp/Speed (9-14s)
+        
+        val = 0.0
+        
+        # 1. Base Drone (Rich low end)
+        drone_freq = 55.0 # A1
+        # Mix 55Hz sine + 110Hz square (low volume) for presence
+        drone = (math.sin(2 * math.pi * drone_freq * t) * 0.5) + \
+                (0.5 if math.sin(2 * math.pi * (drone_freq * 2) * t) > 0 else -0.5) * 0.2
+        
+        # 2. Melody/Texture
+        if t < 4.0:
+            # Slow pulse
+            # Offset pulse 0.5 to keep it positive mostly -> amplitude modulation instead of ring mod
+            pulse = 0.5 + 0.5 * math.sin(2 * math.pi * 2.0 * t) 
+            val = drone * pulse
+        elif t < 9.0:
+            # Chaos - DOH appears
+            # Add noise and higher dissonant tones
+            noise = random.uniform(-0.5, 0.5) * 0.3
+            alarm = math.sin(2 * math.pi * 440 * t) * (1.0 if t % 0.5 < 0.25 else 0.0) * 0.2
+            val = drone + noise + alarm
+        else:
+            # Warp - Driving sequence
+            # Arpeggio
+            tempo = 8.0 # notes per second
+            note_idx = int(t * tempo) % len(bass_notes)
+            bass_freq = bass_notes[note_idx]
+            bass = (1.0 if math.sin(2 * math.pi * bass_freq * t) > 0 else -1.0) * 0.4
+            
+            # High speed wind
+            wind = random.uniform(-0.1, 0.1) * 0.2
+            val = bass + wind
+            
+        data.extend(struct.pack('h', int(max(-1.0, min(1.0, val)) * 32767.0)))
+        
+    save_wav(f"{base_path}/intro_music.wav", bytes(data))
+
 if __name__ == "__main__":
     main()
