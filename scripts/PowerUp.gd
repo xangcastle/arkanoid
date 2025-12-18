@@ -5,41 +5,66 @@ var type = Type.S
 
 const SPEEDS = 100.0
 
-@onready var sprite = $Sprite2D
+@onready var sprite = $AnimatedSprite2D
 
-const TEXTURES = {
-    Type.S: "res://assets/graphics/powerup_slow_1.png",
-    Type.L: "res://assets/graphics/powerup_laser_1.png",
-    Type.C: "res://assets/graphics/powerup_catch_1.png",
-    Type.E: "res://assets/graphics/powerup_expand_1.png",
-    Type.D: "res://assets/graphics/powerup_duplicate_1.png",
-    Type.B: "res://assets/graphics/powerup_warp_1.png",
-    Type.P: "res://assets/graphics/powerup_life_1.png"
+# Cache for SpriteFrames
+static var frames_cache = {}
+
+const TYPE_NAMES = {
+	Type.S: "slow",
+	Type.L: "laser",
+	Type.C: "catch",
+	Type.E: "expand",
+	Type.D: "duplicate",
+	Type.B: "warp",
+	Type.P: "life"
 }
 
 func _ready():
-    # If type was set externally (by GameManager), override the texture
-    # Else random (fallback)
-    # Note: GameManager sets type BEFORE adding to tree, so _ready runs after.
-    var tex = TEXTURES.get(type)
-    if tex:
-        sprite.texture = load(tex)
+	_setup_animation()
+
+func _setup_animation():
+	if type in frames_cache:
+		sprite.sprite_frames = frames_cache[type]
+		sprite.play("default")
+		return
+
+	var frames = SpriteFrames.new()
+	var anim_name = "default"
+	frames.add_animation(anim_name)
+	frames.set_animation_loop(anim_name, true)
+	frames.set_animation_speed(anim_name, 12.0) # 12 FPS for powerups (slower rotation)
+	
+	var base_name = TYPE_NAMES.get(type, "laser")
+	
+	# Load frames (Try up to 16, break if missing)
+	for i in range(1, 17):
+		var path = "res://assets/graphics/powerup_%s_%d.png" % [base_name, i]
+		if ResourceLoader.exists(path):
+			var tex = load(path)
+			frames.add_frame(anim_name, tex)
+		else:
+			break # Stop on first missing frame
+			
+	frames_cache[type] = frames
+	sprite.sprite_frames = frames
+	sprite.play(anim_name)
 
 func _exit_tree():
-    GameManager.powerup_gone()
+	GameManager.powerup_gone()
 
 func _process(delta):
-    position.y += SPEEDS * delta
-    if position.y > 600:
-        queue_free()
+	position.y += SPEEDS * delta
+	if position.y > 600:
+		queue_free()
 
 func _on_body_entered(body):
-    if body.is_in_group("Player"):
-        GameManager.apply_powerup(type, body)
-        AudioManager.play("powerup")
-        queue_free()
-        apply_powerup(body)
-        queue_free()
+	if body.is_in_group("Player"):
+		GameManager.apply_powerup(type, body)
+		AudioManager.play("powerup")
+		queue_free()
+		apply_powerup(body)
+		queue_free()
 
 func apply_powerup(vaus):
-    GameManager.apply_powerup(type, vaus)
+	GameManager.apply_powerup(type, vaus)

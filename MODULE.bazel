@@ -4,6 +4,27 @@ local_path_override(
     path = "bazel/rules/godot",
 )
 
+bazel_dep(name = "rules_python", version = "0.40.0")
+bazel_dep(name = "aspect_rules_py", version = "1.6.4-rc1")
+
+python = use_extension("@rules_python//python/extensions:python.bzl", "python")
+python.toolchain(
+    is_default = True,
+    python_version = "3.11",
+)
+use_repo(
+    python,
+    python = "python_versions",
+)
+
+pip = use_extension("@rules_python//python/extensions:pip.bzl", "pip")
+pip.parse(
+    hub_name = "pypi",
+    python_version = "3.11",
+    requirements_lock = "//:requirements_lock.txt",
+)
+use_repo(pip, "pypi")
+
 godot = use_extension("@rules_godot//:extension.bzl", "godot")
 godot.toolchain(
     name = "godot",

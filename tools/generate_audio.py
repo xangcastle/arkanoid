@@ -5,7 +5,7 @@ import random
 import os
 import json
 
-CONFIG_PATH = "tools/audio/audio_config.json"
+CONFIG_PATH = "tools/audio_config.json"
 BASE_PATH = "assets/audio"
 
 def load_config():

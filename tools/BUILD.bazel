@@ -1,0 +1,41 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary", "py_library")
+
+py_library(
+    name = "audio_config",
+    srcs = [],
+    data = ["audio_config.json"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "audio_editor",
+    srcs = ["audio_editor.py"],
+    data = [":audio_config"],
+    main = "audio_editor.py",
+    tags = ["manual"],  # Exclude from wildcard builds
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "generate_audio",
+    srcs = ["generate_audio.py"],
+    data = [":audio_config"],
+    main = "generate_audio.py",
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "regenerate_audio",
+    srcs = ["generate_audio.py"],
+    args = ["--regenerate"],
+    data = [":audio_config"],
+    main = "generate_audio.py",
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "process_images",
+    srcs = ["process_images.py"],
+    main = "process_images.py",
+    visibility = ["//visibility:public"],
+)

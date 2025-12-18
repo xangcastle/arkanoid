@@ -1,4 +1,13 @@
+load("@aspect_rules_py//py:defs.bzl", "py_binary")
+load("@python//3.11:defs.bzl", "compile_pip_requirements")
 load("@rules_godot//:defs.bzl", "godot_project")
+
+compile_pip_requirements(
+    name = "pypi_requirements",
+    src = "requirements.txt",
+    requirements_txt = "requirements_lock.txt",
+    visibility = ["//tools:__subpackages__"],
+)
 
 godot_project(
     name = "arkanoid",
