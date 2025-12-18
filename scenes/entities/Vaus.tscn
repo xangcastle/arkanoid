@@ -2,13 +2,15 @@
 
 [ext_resource type="Script" path="res://scripts/Vaus.gd" id="1_vaus"]
 [ext_resource type="Texture2D" path="res://assets/graphics/paddle.png" id="2_tex"]
+[ext_resource type="PackedScene" path="res://scenes/entities/Laser.tscn" id="3_laser"]
 
 [sub_resource type="RectangleShape2D" id="rect_shape"]
 size = Vector2(78, 16)
 
-[node name="Vaus" type="CharacterBody2D"]
+[node name="Vaus" type="CharacterBody2D" groups=["Player"]]
 collision_layer = 2
 script = ExtResource("1_vaus")
+laser_scene = ExtResource("3_laser")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_tex")

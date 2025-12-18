@@ -37,9 +37,14 @@ func _physics_process(_delta):
             fire_laser()
         elif current_state == State.CATCH:
             release_ball()
+        else:
+            # Maybe launch ball if stuck at start?
+            var balls = get_tree().get_nodes_in_group("Balls")
+            for b in balls:
+                if not b.active:
+                    b.launch()
 
 func fire_laser():
-    # Logic to instance lasers
     if laser_scene:
         var l1 = laser_scene.instantiate()
         var l2 = laser_scene.instantiate()
@@ -47,19 +52,26 @@ func fire_laser():
         l2.global_position = laser_marker_r.global_position
         get_parent().add_child(l1)
         get_parent().add_child(l2)
-        # Play sound
-        AudioStreamPlayer.new().play() # Placeholder
+        AudioManager.play("laser")
 
 func release_ball():
-    # Signal to ball to detach
-    pass
+    var balls = get_tree().get_nodes_in_group("Balls")
+    for b in balls:
+        if b.stuck_to_paddle:
+             b.launch()
 
 func transform_to(new_state):
+    # Reset first
+    sprite.scale.x = 1.0
+    collision.shape.size.x = 78.0
+    width = 80.0
+    
     current_state = new_state
-    # Update sprite and collision shape based on state
+    
     match current_state:
         State.EXPAND:
-            width = 48.0
-            # Scale sprite/collision
+            width = 112.0 # roughly 1.5x
+            sprite.scale.x = 1.4
+            collision.shape.size.x = 110.0
         _:
-            width = 32.0
+            pass # Reset handled above

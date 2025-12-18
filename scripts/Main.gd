@@ -13,7 +13,14 @@ var vaus: Node2D
 func _ready():
     GameManager.score_changed.connect(_on_score_changed)
     GameManager.lives_changed.connect(_on_lives_changed)
+    GameManager.level_completed.connect(_on_level_completed)
     start_game()
+
+func _on_level_completed():
+    load_level(GameManager.level)
+    spawn_ball() # Reset ball
+    if vaus:
+        vaus.position = Vector2(224, 450) # Reset position
 
 func start_game():
     GameManager.reset_game()
@@ -77,6 +84,45 @@ func _process(_delta):
     pass
     
 func _on_ball_lost():
-    # Called when ball dies
-    GameManager.lose_life()
-    spawn_ball() # Or wait for input
+    # Only lose life if no balls left
+    var balls = get_tree().get_nodes_in_group("Balls")
+    var active_count = 0
+    for b in balls:
+        # Check if b is valid and not queued for deletion
+        if is_instance_valid(b) and not b.is_queued_for_deletion():
+             active_count += 1
+    
+    # The ball calling this is likely still in the group but queued for freeing or about to be?
+    # Actually, queue_free happens after this frame usually, but let's assume the signal caller is dying.
+    # If explicit count is 0 (excluding the one calling if we could filter it), then lose life.
+    
+    # A safer way: Wait a frame or just check count <= 1 (the one dying)
+    if active_count <= 1:
+        GameManager.lose_life()
+        spawn_ball()
+    else:
+        # Just one ball died, others remain
+        pass
+
+func _unhandled_input(event):
+    # Debug Mode: Activate with ARK_DEBUG=1
+    if OS.get_environment("ARK_DEBUG") != "1":
+        return
+
+    if event is InputEventKey and event.pressed:
+        var type = -1
+        match event.keycode:
+            KEY_S: type = 0
+            KEY_L: type = 1
+            KEY_C: type = 2
+            KEY_E: type = 3
+            KEY_D: type = 4
+            KEY_B: type = 5
+            KEY_P: type = 6
+        
+        if type != -1:
+            var player = get_tree().get_first_node_in_group("Player")
+            if player:
+                print("Debug Powerup: ", type)
+                GameManager.apply_powerup(type, player)
+                AudioManager.play("powerup")

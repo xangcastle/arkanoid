@@ -21,7 +21,6 @@ vaus_scene = ExtResource("2_vaus")
 ball_scene = ExtResource("3_ball")
 
 [node name="Background" type="Sprite2D" parent="."]
-scale = Vector2(0.9754464, 0.9941406)
 texture = ExtResource("4_bg")
 centered = false
 region_enabled = true

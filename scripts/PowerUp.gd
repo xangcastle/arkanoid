@@ -18,10 +18,15 @@ const TEXTURES = {
 }
 
 func _ready():
-    type = Type.values()[randi() % Type.size()]
+    # If type was set externally (by GameManager), override the texture
+    # Else random (fallback)
+    # Note: GameManager sets type BEFORE adding to tree, so _ready runs after.
     var tex = TEXTURES.get(type)
     if tex:
         sprite.texture = load(tex)
+
+func _exit_tree():
+    GameManager.powerup_gone()
 
 func _process(delta):
     position.y += SPEEDS * delta
@@ -35,21 +40,4 @@ func _on_body_entered(body):
         queue_free()
 
 func apply_powerup(vaus):
-    match type:
-        Type.S:
-            # Slow ball
-             pass
-        Type.L:
-            vaus.transform_to(vaus.State.LASER)
-        Type.C:
-            vaus.transform_to(vaus.State.CATCH)
-        Type.E:
-            vaus.transform_to(vaus.State.EXPAND)
-        Type.D:
-            # Duplicate balls
-            pass
-        Type.B:
-             # Warp
-             pass
-        Type.P:
-             GameManager.add_life()
+    GameManager.apply_powerup(type, vaus)
