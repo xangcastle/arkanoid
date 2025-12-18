@@ -4,12 +4,13 @@ signal score_changed(new_score)
 signal lives_changed(new_lives)
 signal level_completed
 signal game_over
+signal player_died
 
 var score = 0
 var high_score = 50000
 var lives = 3
 var level = 1
-var max_levels = 36
+var max_levels = 36 # approx
 
 # Powerup System
 var active_powerups_count = 0 
@@ -20,6 +21,10 @@ var powerup_bag = []
 func _ready():
     process_mode = Node.PROCESS_MODE_ALWAYS
     reset_powerup_logic()
+
+func on_player_hit():
+    player_died.emit()
+    lose_life()
 
 func reset_powerup_logic():
     active_powerups_count = 0
