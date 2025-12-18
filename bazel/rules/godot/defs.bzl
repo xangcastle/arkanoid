@@ -34,17 +34,17 @@ _godot_rule = rule(
     executable = True,
 )
 
-def godot_project(name, config="project.godot", **kwargs):
+def godot_project(name, **kwargs):
     """Defines targets for running a Godot project.
 
     This macro creates three executable targets for working with a Godot project:
     - `{name}.import`: Imports and processes project assets
-    - `{name}.play`: Runs the game in debug mode with the window visible
-    - `{name}.engine`: Opens the Godot editor in fullscreen mode
+    - `{name}.debug`: Runs the game in debug mode with the window visible
+    - `{name}.editor`: Opens the Godot editor in fullscreen mode
 
     Args:
         name: The base name for the generated targets. The actual targets will be
-            named `{name}.import`, `{name}.play`, and `{name}.engine`.
+            named `{name}.import`, `{name}.debug`, and `{name}.editor`.
         config: Path to the Godot project configuration file (project.godot).
             Defaults to "project.godot".
         **kwargs: Additional arguments passed to the underlying _godot_rule.
@@ -65,8 +65,8 @@ def godot_project(name, config="project.godot", **kwargs):
 
         This creates targets:
         - `//:my_game.import` - Import project assets
-        - `//:my_game.play` - Run the game
-        - `//:my_game.engine` - Open the editor
+        - `//:my_game.debug` - Run the game
+        - `//:my_game.editor` - Open the editor
 
         Custom project file location:
 
@@ -78,9 +78,9 @@ def godot_project(name, config="project.godot", **kwargs):
         ```
 
     Usage:
-        Run the game: `bazel run //:my_game.play`
         Import assets: `bazel run //:my_game.import`
-        Open editor: `bazel run //:my_game.engine`
+        Run the game: `bazel run //:my_game.debug`
+        Open editor: `bazel run //:my_game.editor`
 
     Note:
         The macro assumes the Godot project files are in the same directory
@@ -94,17 +94,17 @@ def godot_project(name, config="project.godot", **kwargs):
         **kwargs
     )
 
-    play_args = "--path $(location) -d -w"
+    play_args = "--path $(location) --debug --windowed"
     _godot_rule(
-        name = name + ".play",
+        name = name + ".debug",
         arguments = play_args,
         **kwargs
     )
 
-    engine_args = "--fullscreen $(location)/{}".format(config)
+    editor_args = "--path $(location) --editor --fullscreen"
     _godot_rule(
-        name = name + ".engine",
-        arguments = engine_args,
+        name = name + ".editor",
+        arguments = editor_args,
         **kwargs
     )
 
