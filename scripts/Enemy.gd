@@ -72,7 +72,9 @@ func _physics_process(delta):
 
 func _on_body_entered(body):
     if body.is_in_group("Player"):
-        GameManager.on_player_hit()
+        # Enemy dies on impact with Vaus (User request)
+        GameManager.add_score(100)
+        AudioManager.play("explosion")
         queue_free()
     elif body.is_in_group("Balls"):
         # Ball hit enemy

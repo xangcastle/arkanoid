@@ -24,6 +24,7 @@ AudioManager="*res://scripts/AudioManager.gd"
 
 window/size/viewport_width=448
 window/size/viewport_height=512
+window/size/mode="fullscreen"
 window/size/window_width_override=896
 window/size/window_height_override=1024
 window/stretch/mode="canvas_items"
