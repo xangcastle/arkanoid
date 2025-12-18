@@ -1,0 +1,11 @@
+bazel_dep(name = "rules_godot", version = "0.0.0")
+local_path_override(
+    module_name = "rules_godot",
+    path = "bazel/rules/godot",
+)
+
+godot = use_extension("@rules_godot//:extension.bzl", "godot")
+godot.toolchain(
+    name = "godot",
+)
+use_repo(godot, "godot")

@@ -1,0 +1,63 @@
+[gd_scene load_steps=8 format=3 uid="uid://b8j5x6yq0q1w"]
+
+[ext_resource type="Script" uid="uid://ci02ffqqsug6p" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" uid="uid://c8j5x6yq0q2w" path="res://scenes/entities/Vaus.tscn" id="2_vaus"]
+[ext_resource type="PackedScene" uid="uid://eak5x6yq0q3w" path="res://scenes/entities/Ball.tscn" id="3_ball"]
+[ext_resource type="Texture2D" uid="uid://dqvvn2dr7nijm" path="res://assets/graphics/background.png" id="4_bg"]
+
+[sub_resource type="WorldBoundaryShape2D" id="wb_left"]
+normal = Vector2(1, 0)
+
+[sub_resource type="WorldBoundaryShape2D" id="wb_right"]
+normal = Vector2(-1, 0)
+distance = -448.0
+
+[sub_resource type="WorldBoundaryShape2D" id="wb_top"]
+normal = Vector2(0, 1)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_main")
+vaus_scene = ExtResource("2_vaus")
+ball_scene = ExtResource("3_ball")
+
+[node name="Background" type="Sprite2D" parent="."]
+scale = Vector2(0.9754464, 0.9941406)
+texture = ExtResource("4_bg")
+centered = false
+region_enabled = true
+region_rect = Rect2(0, 0, 448, 512)
+
+[node name="Walls" type="StaticBody2D" parent="."]
+collision_mask = 6
+
+[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
+shape = SubResource("wb_left")
+
+[node name="RightWall" type="CollisionShape2D" parent="Walls"]
+shape = SubResource("wb_right")
+
+[node name="TopWall" type="CollisionShape2D" parent="Walls"]
+shape = SubResource("wb_top")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="CanvasLayer"]
+offset_left = 24.0
+offset_top = 8.0
+offset_right = 100.0
+offset_bottom = 31.0
+text = "SCORE: 0"
+
+[node name="HighScoreLabel" type="Label" parent="CanvasLayer"]
+offset_left = 150.0
+offset_top = 8.0
+offset_right = 300.0
+offset_bottom = 31.0
+text = "HIGH: 50000"
+
+[node name="LivesLabel" type="Label" parent="CanvasLayer"]
+offset_left = 342.0
+offset_top = 8.0
+offset_right = 424.0
+offset_bottom = 31.0
+text = "LIVES: 3"
